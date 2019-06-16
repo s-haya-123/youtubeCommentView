@@ -5,14 +5,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PlayComponent } from './play/play.component';
 
+import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
+import { ChartComponent } from './chart/chart.component'
+
 @NgModule({
   declarations: [
     AppComponent,
-    PlayComponent
+    PlayComponent,
+    ChartComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgxYoutubePlayerModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

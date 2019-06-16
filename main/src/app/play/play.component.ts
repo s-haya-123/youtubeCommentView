@@ -1,43 +1,48 @@
-import { Component, OnInit } from '@angular/core';
-import 'youtube';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { ChartComponent } from '../chart/chart.component'
+
 @Component({
   selector: 'app-play',
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.scss']
 })
 export class PlayComponent implements OnInit {
-  player:YT.Player;
-  done:Boolean = true;
+  player: YT.Player;
+  private id: string = '7QzUKRnY6oU';
+  private canvasWidth: number;
+  private canvasHeight: number;
   constructor() { } 
   ngOnInit() {
-    let tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/embed/fbaoedS3Vcs";
-    let firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    this.setCanvasSize();
+
   }
 
-  onYouTubeIframeAPIReady() {
-    this.player = new YT.Player('player', {
-      height: '360',
-      width: '640',
-      videoId: 'M7lc1UVf-VE',
-      events: {
-        'onReady': this.onPlayerReady,
-        'onStateChange': this.onPlayerStateChange
-      }
-    });
+  savePlayer(player) {
+    this.player = player;
+    this.setPlayerSize();
+    console.log('player instance', player);
   }
-  onPlayerReady(event: YT.PlayerEvent) {
-    event.target.playVideo();
+  onStateChange(event) {
+    console.log('player state', event.data);
   }
-  onPlayerStateChange(event: YT.OnStateChangeEvent) {
-    if (event.data == YT.PlayerState.PLAYING && !this.done) {
-      setTimeout(this.stopVideo, 6000);
-      this.done = true;
-    }
+  onClick() {
+    console.log("click");
+    this.player.seekTo(30,true);
   }
-  stopVideo() {
-    this.player.stopVideo();
+  @HostListener('window:resize',['$event'])
+  onresize(event){
+    this.setPlayerSize();
+    this.setCanvasSize
+  }
+
+  private setPlayerSize() {
+    let playerWidth = window.innerWidth*2/3;
+    let playerHeight = window.innerHeight / 2;
+    this.player.setSize(playerWidth,playerHeight);
+  }
+  private setCanvasSize() {
+    this.canvasWidth = window.innerWidth*2/3;
+    this.canvasHeight = 320;
   }
 
 }

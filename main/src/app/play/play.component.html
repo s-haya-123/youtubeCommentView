@@ -1,1 +1,10 @@
-<div id="player"></div>
+<div class="player">
+  <youtube-player
+    [videoId]="id"
+    (ready)="savePlayer($event)"
+    (change)="onStateChange($event)">
+  </youtube-player>
+  <canvas #canvas [width]="canvasWidth" [height]="canvasHeight"></canvas>
+  <app-chart></app-chart>
+</div>
+<button (click)="onClick()">再生</button>
