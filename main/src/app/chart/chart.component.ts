@@ -1,10 +1,23 @@
-import { element } from 'protractor';
-import { Component, OnInit, AfterViewInit, Input, ViewChild, ElementRef,OnChanges} from '@angular/core';
-import { Chart, ChartData, ChartOptions } from 'chart.js';
+import { Component, AfterViewInit, Input, ViewChild, ElementRef,OnChanges} from '@angular/core';
+import { Chart } from 'chart.js';
 
 class ChartElemet {
-  hidden: boolean
-  _index: number
+  hidden: boolean;
+  _index: number;
+}
+class ChartData {
+  commentNumber: number;
+  label: string;
+  second: number;
+  constructor(
+    commentNumber: number,
+    label: string,
+    second: number
+    ) {
+      this.commentNumber = commentNumber;
+      this.label = label;
+      this.second = second;
+  }
 }
 
 @Component({
@@ -25,9 +38,14 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private context: CanvasRenderingContext2D;
   private chart: Chart;
   private color = [ 'rgba(255,99,132,1)' ];
-  private label = "label";
-  private data = [12, 19, 3, 5, 2, 3];
-  private labels = ["12", "19", "3", "5", "2", "3"];
+  private label = "コメント数";
+  private chartDatas:ChartData[] = [
+    new ChartData(12,"0:30",30),
+    new ChartData(19,"1:00",60),
+    new ChartData(3,"1:30",90),
+    new ChartData(5,"2:00",120),
+    new ChartData(3,"2:30",150),
+  ]
 
   constructor() { }
 
@@ -39,11 +57,14 @@ export class ChartComponent implements AfterViewInit,OnChanges {
     // canvasを取得
     this.context = this.ref.nativeElement.getContext('2d');
     this.context.canvas.height = window.innerHeight / 6;
+    let labels = this.chartDatas.map( (chartData:ChartData) => chartData.label );
+    let datas = this.chartDatas.map( (chartData:ChartData)=> chartData.commentNumber);
+
     let data:Chart.ChartData = {
-      labels: this.labels,
+      labels: labels,
       datasets: [{
         label: this.label,
-        data: this.data,
+        data: datas,
         backgroundColor: [
             'rgba(255, 255, 255, 0.2)',
         ],
@@ -63,7 +84,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
         onClick:(event,element:ChartElemet[] | null)=>{
           if (element != null){
             let index = element[0]._index;
-            console.log(this.data[index]);
+            console.log(this.chartDatas[index]);
           }
         }
       }
