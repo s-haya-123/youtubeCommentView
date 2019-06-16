@@ -1,5 +1,4 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { ChartComponent } from '../chart/chart.component'
 
 @Component({
   selector: 'app-play',
@@ -24,16 +23,12 @@ export class PlayComponent implements OnInit {
   onStateChange(event) {
     console.log('player state', event.data);
   }
-  onClick() {
-    this.player.seekTo(30,true);
-  }
   onReceiveSeekSecond(second: number) {
     this.player.seekTo(second, true);
   }
   @HostListener('window:resize',['$event'])
-  onresize(event){
+  onresize(_){
     this.setPlayerSize();
-    // this.setCanvasSize();
   }
 
   private setPlayerSize() {
