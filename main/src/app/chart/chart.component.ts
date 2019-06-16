@@ -1,12 +1,20 @@
+import { element } from 'protractor';
 import { Component, OnInit, AfterViewInit, Input, ViewChild, ElementRef,OnChanges} from '@angular/core';
 import { Chart, ChartData, ChartOptions } from 'chart.js';
+
+class ChartElemet {
+  hidden: boolean
+  _index: number
+}
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss']
 })
-export class ChartComponent implements OnInit,AfterViewInit,OnChanges {
+
+
+export class ChartComponent implements AfterViewInit,OnChanges {
 
   @ViewChild('canvas',{static: false})
   ref: ElementRef;
@@ -23,8 +31,6 @@ export class ChartComponent implements OnInit,AfterViewInit,OnChanges {
 
   constructor() { }
 
-  ngOnInit() {
-  }
   ngOnChanges(){
     this.chart.update();
   }
@@ -43,7 +49,6 @@ export class ChartComponent implements OnInit,AfterViewInit,OnChanges {
         ],
         borderColor: this.color,
         borderWidth: 1,
-        
       }]
     };
     
@@ -51,8 +56,18 @@ export class ChartComponent implements OnInit,AfterViewInit,OnChanges {
     this.chart = new Chart(this.context, {
       type: 'line',
       data: data,
+      options: {
+        tooltips: {
+          mode: 'nearest'
+        },
+        onClick:(event,element:ChartElemet[] | null)=>{
+          if (element != null){
+            let index = element[0]._index;
+            console.log(this.data[index]);
+          }
+        }
+      }
     });
   }
-
 }
 
