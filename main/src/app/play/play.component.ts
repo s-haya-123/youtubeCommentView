@@ -14,7 +14,6 @@ export class PlayComponent implements OnInit {
   constructor() { } 
   ngOnInit() {
     this.setCanvasSize();
-
   }
 
   savePlayer(player) {
@@ -26,17 +25,15 @@ export class PlayComponent implements OnInit {
     console.log('player state', event.data);
   }
   onClick() {
-    console.log("click");
     this.player.seekTo(30,true);
   }
   onReceiveSeekSecond(second: number) {
-    console.log(second);
     this.player.seekTo(second, true);
   }
   @HostListener('window:resize',['$event'])
   onresize(event){
     this.setPlayerSize();
-    this.setCanvasSize
+    // this.setCanvasSize();
   }
 
   private setPlayerSize() {

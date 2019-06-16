@@ -5,6 +5,6 @@
     (change)="onStateChange($event)">
   </youtube-player>
   <!-- <canvas #canvas [width]="canvasWidth" [height]="canvasHeight"></canvas> -->
-  <app-chart (chartClickEvent)="onReceiveSeekSecond($event)"></app-chart>
+  <app-chart (chartClickEvent)="onReceiveSeekSecond($event)" [width]="canvasWidth" [height]="canvasHeight"></app-chart>
 </div>
 <button (click)="onClick()">再生</button>
