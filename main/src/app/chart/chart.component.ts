@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, Input, ViewChild, ElementRef,OnChanges} from '@angular/core';
+import { Component, AfterViewInit, Input, ViewChild, ElementRef, OnChanges, EventEmitter, Output } from '@angular/core';
 import { Chart } from 'chart.js';
 
 class ChartElemet {
@@ -34,6 +34,9 @@ export class ChartComponent implements AfterViewInit,OnChanges {
 
   @Input() width: number;
   @Input() height: number;
+
+  @Output()
+  chartClickEvent = new EventEmitter<number>();
 
   private context: CanvasRenderingContext2D;
   private chart: Chart;
@@ -81,10 +84,11 @@ export class ChartComponent implements AfterViewInit,OnChanges {
         tooltips: {
           mode: 'nearest'
         },
-        onClick:(event,element:ChartElemet[] | null)=>{
-          if (element != null){
+        onClick:(event,element:ChartElemet[])=>{
+          if (element.length > 0){
             let index = element[0]._index;
-            console.log(this.chartDatas[index]);
+            let chart = this.chartDatas[index];
+            this.chartClickEvent.emit(chart.second)
           }
         }
       }

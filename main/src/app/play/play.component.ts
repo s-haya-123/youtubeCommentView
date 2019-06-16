@@ -29,6 +29,10 @@ export class PlayComponent implements OnInit {
     console.log("click");
     this.player.seekTo(30,true);
   }
+  onReceiveSeekSecond(second: number) {
+    console.log(second);
+    this.player.seekTo(second, true);
+  }
   @HostListener('window:resize',['$event'])
   onresize(event){
     this.setPlayerSize();
