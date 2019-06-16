@@ -1,16 +1,18 @@
+import { YoutubeService } from './../youtube.service';
 import { Component, OnInit, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-play',
   templateUrl: './play.component.html',
-  styleUrls: ['./play.component.scss']
+  styleUrls: ['./play.component.scss'],
+  providers: [ YoutubeService ]
 })
 export class PlayComponent implements OnInit {
   player: YT.Player;
   private id: string = '7QzUKRnY6oU';
   private canvasWidth: number;
   private canvasHeight: number;
-  constructor() { } 
+  constructor(private youtubeService: YoutubeService) { } 
   ngOnInit() {
     this.setCanvasSize();
   }

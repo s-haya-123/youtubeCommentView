@@ -1,3 +1,4 @@
+import { YoutubeService } from './youtube.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -6,7 +7,8 @@ import { AppComponent } from './app.component';
 import { PlayComponent } from './play/play.component';
 
 import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
-import { ChartComponent } from './chart/chart.component'
+import { ChartComponent } from './chart/chart.component';
+
 
 @NgModule({
   declarations: [
@@ -19,7 +21,7 @@ import { ChartComponent } from './chart/chart.component'
     AppRoutingModule,
     NgxYoutubePlayerModule.forRoot()
   ],
-  providers: [],
+  providers: [YoutubeService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

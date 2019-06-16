@@ -1,29 +1,18 @@
 import { Component, AfterViewInit, Input, ViewChild, ElementRef, OnChanges, EventEmitter, Output } from '@angular/core';
 import { Chart } from 'chart.js';
+import { ChartData, YoutubeService } from '../youtube.service' 
 
 class ChartElemet {
   hidden: boolean;
   _index: number;
 }
-class ChartData {
-  commentNumber: number;
-  label: string;
-  second: number;
-  constructor(
-    commentNumber: number,
-    label: string,
-    second: number
-    ) {
-      this.commentNumber = commentNumber;
-      this.label = label;
-      this.second = second;
-  }
-}
+
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
-  styleUrls: ['./chart.component.scss']
+  styleUrls: ['./chart.component.scss'],
+  providers: [ YoutubeService ]
 })
 
 
@@ -42,18 +31,19 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private chart: Chart;
   private color = [ 'rgba(255,99,132,1)' ];
   private label = "コメント数";
-  private chartDatas:ChartData[] = [
-    new ChartData(12,"0:30",30),
-    new ChartData(19,"1:00",60),
-    new ChartData(3,"1:30",90),
-    new ChartData(5,"2:00",120),
-    new ChartData(3,"2:30",150),
-  ]
+  private chartDatas:ChartData[];
 
-  constructor() { }
+  constructor(private youtubeService: YoutubeService) { 
+    youtubeService.comment().subscribe( (chartDatas:ChartData[]) => {
+      this.chartDatas = chartDatas;
+    })
+  }
 
   ngOnChanges(){
-    this.chart.update();
+    if(this.chart != undefined){
+      this.chart.update();
+    }
+    
   }
   
   ngAfterViewInit() {
