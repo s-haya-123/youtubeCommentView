@@ -7,3 +7,10 @@
   align-items: stretch;
   text-align: center;
 }
+.title-contain {
+  margin: auto;
+  .title {
+    font-size: 1.5rem;
+    text-align: left;
+  }
+}

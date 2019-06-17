@@ -4,6 +4,11 @@
     (ready)="savePlayer($event)"
     (change)="onStateChange($event)">
   </youtube-player>
+  <div class="title-contain" [ngStyle]="{'width':canvasWidth+'px'}">
+    <div class="title">
+      {{title}}
+    </div>
+  </div>
   <app-chart
     (chartClickEvent)="onReceiveSeekSecond($event)"
     [width]="canvasWidth"

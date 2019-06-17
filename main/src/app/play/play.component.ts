@@ -12,6 +12,7 @@ export class PlayComponent implements OnInit {
   private id: string = '7QzUKRnY6oU';
   private canvasWidth: number;
   private canvasHeight: number;
+  private title = "はじめての料理配信【Cooking Simulator】";
   constructor(private youtubeService: YoutubeService) { } 
   ngOnInit() {
     this.setCanvasSize();
