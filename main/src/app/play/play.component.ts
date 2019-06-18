@@ -18,9 +18,7 @@ export class PlayComponent implements OnInit {
   constructor(private youtubeService: YoutubeService) { } 
   ngOnInit() {
     this.setCanvasSize();
-    this.youtubeService.getYoutubeData().subscribe((youtubeData: YoutubeData)=>{
-      this.title = youtubeData.title;
-    });
+    this.youtubeData$ = this.youtubeService.getYoutubeData();
   }
 
   savePlayer(player) {

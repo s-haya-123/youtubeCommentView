@@ -6,7 +6,7 @@
   </youtube-player>
   <div class="title-contain" [ngStyle]="{'width':canvasWidth+'px'}">
     <div class="title">
-      {{ title }}
+      {{ (youtubeData$ | async).title }}
     </div>
   </div>
   <app-chart
