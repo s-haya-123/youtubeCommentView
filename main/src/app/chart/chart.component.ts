@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, Input, ViewChild, ElementRef, OnChanges, EventEmitter, Output } from '@angular/core';
 import { Chart } from 'chart.js';
-import { ChartData, YoutubeService } from '../youtube.service' 
+import { YoutubeService, YoutubeData, CommentData } from '../youtube.service';
 
 class ChartElemet {
   hidden: boolean;
@@ -31,11 +31,11 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private chart: Chart;
   private color = [ 'rgba(255,99,132,1)' ];
   private label = "コメント数";
-  private chartDatas:ChartData[];
+  private chartDatas:CommentData[];
 
   constructor(private youtubeService: YoutubeService) { 
-    youtubeService.comment().subscribe( (chartDatas:ChartData[]) => {
-      this.chartDatas = chartDatas;
+    youtubeService.getYoutubeData().subscribe( (youtubeData:YoutubeData) => {
+      this.chartDatas = youtubeData.comments;
     })
   }
 
@@ -50,8 +50,8 @@ export class ChartComponent implements AfterViewInit,OnChanges {
     // canvasを取得
     this.context = this.ref.nativeElement.getContext('2d');
     this.context.canvas.height = window.innerHeight / 6;
-    let labels = this.chartDatas.map( (chartData:ChartData) => chartData.label );
-    let datas = this.chartDatas.map( (chartData:ChartData)=> chartData.commentNumber);
+    let labels = this.chartDatas.map( (chartData: CommentData) => chartData.label );
+    let datas = this.chartDatas.map( (chartData: CommentData)=> chartData.commentNumber);
 
     let data:Chart.ChartData = {
       labels: labels,

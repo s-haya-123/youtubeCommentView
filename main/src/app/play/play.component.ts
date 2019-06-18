@@ -1,5 +1,6 @@
-import { YoutubeService } from './../youtube.service';
+import { YoutubeService, YoutubeData } from './../youtube.service';
 import { Component, OnInit, HostListener } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-play',
@@ -12,10 +13,14 @@ export class PlayComponent implements OnInit {
   private id: string = '7QzUKRnY6oU';
   private canvasWidth: number;
   private canvasHeight: number;
-  private title = "はじめての料理配信【Cooking Simulator】";
+  private youtubeData$: Observable<YoutubeData>;
+  private title:string;
   constructor(private youtubeService: YoutubeService) { } 
   ngOnInit() {
     this.setCanvasSize();
+    this.youtubeService.getYoutubeData().subscribe((youtubeData: YoutubeData)=>{
+      this.title = youtubeData.title;
+    });
   }
 
   savePlayer(player) {
@@ -35,12 +40,12 @@ export class PlayComponent implements OnInit {
   }
 
   private setPlayerSize() {
-    let playerWidth = window.innerWidth*2/3;
+    let playerWidth = window.innerWidth * 2 / 3;
     let playerHeight = window.innerHeight / 2;
     this.player.setSize(playerWidth,playerHeight);
   }
   private setCanvasSize() {
-    this.canvasWidth = window.innerWidth*2/3;
+    this.canvasWidth = window.innerWidth * 2 / 3;
     this.canvasHeight = 320;
   }
 
