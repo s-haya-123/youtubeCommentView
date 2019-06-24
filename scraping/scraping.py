@@ -33,14 +33,6 @@ def get_comment_data(session,target_url):
     comment_data = get_comment_data_from_dict_comment(dict_comment)
     return (comment_data,next_url)
 
-target_url = "https://www.youtube.com/watch?v=juRmM7oa2Jg"
-session = requests.Session()
-
-# まず動画ページにrequestsを実行しhtmlソースを手に入れてlive_chat_replayの先頭のurlを入手
-html = requests.get(target_url)
-soup = BeautifulSoup(html.text, "html.parser")
-next_url = get_next_url_from_soup(soup)
-
 def translate_comment_data_to_comment_dto(comment_data):
     if "addChatItemAction" not in comment_data["replayChatItemAction"]["actions"][0]:
         return
@@ -73,7 +65,13 @@ def translate_live_paid_to_dto(live_paid,timestamp_msec):
     purcahse_amount = live_paid["purchaseAmountText"]["simpleText"]
     return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purcahse_amount)
 
+target_url = "https://www.youtube.com/watch?v=juRmM7oa2Jg"
+session = requests.Session()
 
+# まず動画ページにrequestsを実行しhtmlソースを手に入れてlive_chat_replayの先頭のurlを入手
+html = requests.get(target_url)
+soup = BeautifulSoup(html.text, "html.parser")
+next_url = get_next_url_from_soup(soup)
 while(1):
     try:
         (comment_data,next_url) = get_comment_data(session,next_url)
