@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import json
 import requests
+from Comment import Comment
 
 def get_next_url_from_soup(soup):
     for iframe in soup.find_all("iframe"):
@@ -40,11 +41,43 @@ html = requests.get(target_url)
 soup = BeautifulSoup(html.text, "html.parser")
 next_url = get_next_url_from_soup(soup)
 
+def translate_comment_data_to_comment_dto(comment_data):
+    if "addChatItemAction" not in comment_data["replayChatItemAction"]["actions"][0]:
+        return
+    item = comment_data["replayChatItemAction"]["actions"][0]["addChatItemAction"]["item"]
+    timestamp_msec = comment_data["replayChatItemAction"]["videoOffsetTimeMsec"]
+    if "liveChatPaidMessageRenderer" in item:
+        return translate_live_paid_to_dto(item["liveChatPaidMessageRenderer"],timestamp_msec)
+    elif "liveChatTextMessageRenderer" in item:
+        return translate_live_text_to_dto(item["liveChatTextMessageRenderer"],timestamp_msec)
+    else:
+        return 
+
+def translate_live_text_to_dto(live_text,timestamp_msec):
+    id = live_text["id"]
+    message = live_text["message"]
+    author_name = live_text["authorName"]["simpleText"]
+    thumbnails = live_text["authorPhoto"]["thumbnails"][0]["url"]
+    timestamp_text = live_text["timestampText"]["simpleText"]
+    purcahse_amount = ""
+    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purcahse_amount)
+
+
+
+def translate_live_paid_to_dto(live_paid,timestamp_msec):
+    id = live_paid["id"]
+    message =  live_paid["message"] if "message" in live_paid else ""
+    author_name = live_paid["authorName"]["simpleText"]
+    thumbnails = live_paid["authorPhoto"]["thumbnails"][0]["url"]
+    timestamp_text = live_paid["timestampText"]["simpleText"]
+    purcahse_amount = live_paid["purchaseAmountText"]["simpleText"]
+    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purcahse_amount)
 
 
 while(1):
     try:
         (comment_data,next_url) = get_comment_data(session,next_url)
+        comments = [ translate_comment_data_to_comment_dto(data) for data in comment_data if data is Comment]
         print(next_url)
     except:
         break

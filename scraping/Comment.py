@@ -6,6 +6,6 @@ class Comment:
     message: str
     author_name: str
     thumbnails: str
-    timestamp: str
-    timestampText: str
+    timestamp_msec: str
+    timestamp_text: str
     purcahse_amount: str
