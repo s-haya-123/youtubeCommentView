@@ -3,7 +3,7 @@ import json
 import requests
 from Comment import Comment
 from CommentDatabase import CommentDatabase
-from CommentDatabase import CommentDatabaseCloudFunc
+from CommentDatabase import CommentDatabaseLocalPostgres
 
 def get_next_url_from_soup(soup):
     for iframe in soup.find_all("iframe"):
@@ -49,7 +49,7 @@ def translate_comment_data_to_comment_dto(comment_data):
 
 def translate_live_text_to_dto(live_text,timestamp_msec):
     id = live_text["id"]
-    message = live_text["message"]
+    message = live_text["message"]["runs"][0]["text"]
     author_name = live_text["authorName"]["simpleText"]
     thumbnails = live_text["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_text["timestampText"]["simpleText"]
@@ -60,7 +60,7 @@ def translate_live_text_to_dto(live_text,timestamp_msec):
 
 def translate_live_paid_to_dto(live_paid,timestamp_msec):
     id = live_paid["id"]
-    message =  live_paid["message"] if "message" in live_paid else ""
+    message =  live_paid["message"]["runs"][0]["text"] if "message" in live_paid else ""
     author_name = live_paid["authorName"]["simpleText"]
     thumbnails = live_paid["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_paid["timestampText"]["simpleText"]
@@ -78,11 +78,9 @@ html = requests.get(target_url)
 soup = BeautifulSoup(html.text, "html.parser")
 next_url = get_next_url_from_soup(soup)
 while(1):
-    try:
         (comment_data,next_url) = get_comment_data(session,next_url)
-        comments = [ translate_comment_data_to_comment_dto(data) for data in comment_data if data is Comment]
-        database = CommentDatabaseCloudFunc()
-        insert_comment(database,comments[0])
-        print(next_url)
-    except:
+        comments = [data for data in [ translate_comment_data_to_comment_dto(data) for data in comment_data ] if data is not None]
+        database = CommentDatabaseLocalPostgres()
+        for comment in comments:
+            insert_comment(database,comment)
         break
