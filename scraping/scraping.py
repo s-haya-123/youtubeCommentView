@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import json
 import requests
 from Comment import Comment
+from CommentDatabase import CommentDatabase
+from CommentDatabase import CommentDatabaseCloudFunc
 
 def get_next_url_from_soup(soup):
     for iframe in soup.find_all("iframe"):
@@ -65,6 +67,9 @@ def translate_live_paid_to_dto(live_paid,timestamp_msec):
     purcahse_amount = live_paid["purchaseAmountText"]["simpleText"]
     return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purcahse_amount)
 
+def insert_comment(database: CommentDatabase, comment: Comment):
+    database.upload_comment(comment)
+
 target_url = "https://www.youtube.com/watch?v=juRmM7oa2Jg"
 session = requests.Session()
 
@@ -76,6 +81,8 @@ while(1):
     try:
         (comment_data,next_url) = get_comment_data(session,next_url)
         comments = [ translate_comment_data_to_comment_dto(data) for data in comment_data if data is Comment]
+        database = CommentDatabaseCloudFunc()
+        insert_comment(database,comments[0])
         print(next_url)
     except:
         break
