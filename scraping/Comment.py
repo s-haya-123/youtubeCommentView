@@ -8,4 +8,5 @@ class Comment:
     thumbnails: str
     timestamp_msec: str
     timestamp_text: str
-    purcahse_amount: str
+    purchase_amount: str
+    movie_id: str

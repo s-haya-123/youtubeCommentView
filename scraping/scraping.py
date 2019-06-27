@@ -53,8 +53,8 @@ def translate_live_text_to_dto(live_text,timestamp_msec):
     author_name = live_text["authorName"]["simpleText"]
     thumbnails = live_text["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_text["timestampText"]["simpleText"]
-    purcahse_amount = ""
-    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purcahse_amount)
+    purchase_amount = ""
+    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount)
 
 
 
@@ -64,8 +64,8 @@ def translate_live_paid_to_dto(live_paid,timestamp_msec):
     author_name = live_paid["authorName"]["simpleText"]
     thumbnails = live_paid["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_paid["timestampText"]["simpleText"]
-    purcahse_amount = live_paid["purchaseAmountText"]["simpleText"]
-    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purcahse_amount)
+    purchase_amount = live_paid["purchaseAmountText"]["simpleText"]
+    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount)
 
 def insert_comment(database: CommentDatabase, comment: Comment):
     database.upload_comment(comment)
@@ -78,9 +78,11 @@ html = requests.get(target_url)
 soup = BeautifulSoup(html.text, "html.parser")
 next_url = get_next_url_from_soup(soup)
 while(1):
+    try:
         (comment_data,next_url) = get_comment_data(session,next_url)
         comments = [data for data in [ translate_comment_data_to_comment_dto(data) for data in comment_data ] if data is not None]
         database = CommentDatabaseLocalPostgres()
         for comment in comments:
             insert_comment(database,comment)
+    except:
         break
