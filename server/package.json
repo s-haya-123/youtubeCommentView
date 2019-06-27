@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
+    "@types/pg": "^7.4.14",
+    "pg": "^7.11.0",
     "typescript": "^3.5.2"
   }
 }

@@ -1,3 +1,5 @@
+import { getComment } from './index';
+import { Client } from 'pg'; 
 export class YoutubeCommentRow {
     constructor(
         public id: string,
@@ -12,12 +14,28 @@ export class YoutubeCommentRow {
 }
 
 export interface CommentDatabase {
-    getComments(movieId: string): YoutubeCommentRow[];
+    getComments(movieId: string): Promise<YoutubeCommentRow[]>;
 }
 
 export class CommentDatabaseLocalPostgres implements CommentDatabase {
-    getComments(movieId: string){
-        const comment = new YoutubeCommentRow("","test","","","","","",movieId);
-        return [ comment ];
+    async getComments(movieId: string): Promise<YoutubeCommentRow[]>{
+        const client = await this.getPgClient();
+        return this.getCommentsFromPg(client,movieId);
+    }
+    private async getPgClient(): Promise<Client> {
+        const client = new Client({
+            host: 'localhost',
+            database: 'postgres',
+            user: 'postgres',
+            password: 'secret'
+        });
+        await client.connect();
+        return client;
+    }
+    private async getCommentsFromPg(client: Client, movieId: string):Promise<YoutubeCommentRow[]> {
+        const result = await client.query(`SELECT * FROM comment WHERE movie_id='${movieId}'`);
+        return result.rows.map((row)=>{
+            return new YoutubeCommentRow(row["id"],row["message"],row["author_name"],row["thumbnails"],row["timestamp_msec"],row["timestamp_text"],row["purchase_amount"],row["movie_id"]);
+        });
     }
 }
