@@ -11,6 +11,7 @@ export const getComment = async (req:any,res:any) => {
         const movieId = req.query.movie_id;
         const commets = await getComments(db,movieId);
         const statics = takeStaticsOfComment(commets,bin, true);
+        res.header('Access-Control-Allow-Origin', "*");
         res.status(200).send(statics);
     } else  {
         res.status(400).end();
@@ -34,7 +35,8 @@ function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isEx
         }
     }, results).map((commentNumber,index)=>{
         const seconds = Math.floor(bin / 1000) * (index + 1);
-        const label = `${Math.floor(seconds / 60)}:${seconds % 60}`;
+        const secondsText = `0${seconds % 60}`.slice(-2);
+        const label = `${Math.floor(seconds / 60)}:${secondsText}`;
         return new YoutubeCommentStatics(commentNumber,label,seconds);
     });
 }
