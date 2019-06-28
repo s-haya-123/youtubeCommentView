@@ -37,9 +37,9 @@ export class YoutubeService {
       return {unsubscribe() {}};
     })
   }
-  getYoutubeComment(): Observable<CommentData[]> {
+  getYoutubeComment(id: string, bin: number): Observable<CommentData[]> {
     return new Observable( (obserber)=>{
-      this.http.get("http://localhost:8010/tensile-pixel-243512/us-central1/getComment?bin=60000\&movie_id=juRmM7oa2Jg")
+      this.http.get(`http://localhost:8010/tensile-pixel-243512/us-central1/getComment?bin=${bin}\&movie_id=${id}`)
       .subscribe((datas: Array<any>)=>{
         const commentDatas = datas.map(data=>{
           return new CommentData(data["commentNumber"], data["label"], data["second"]);

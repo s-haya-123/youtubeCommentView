@@ -23,6 +23,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
 
   @Input() width: number;
   @Input() height: number;
+  @Input() id: string;
 
   @Output()
   chartClickEvent = new EventEmitter<number>();
@@ -34,15 +35,15 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private chartDatas:CommentData[];
 
   constructor(private youtubeService: YoutubeService) { 
-    youtubeService.getYoutubeComment().subscribe(comments=>{
-      this.chartDatas = comments;
-      this.drawCanvas();
-    });
+    
   }
 
-  ngOnChanges(){
-    if(this.chart != undefined){
-      this.chart.update();
+  ngOnChanges(changes: any){
+    if( changes.id) {
+      this.youtubeService.getYoutubeComment(this.id,30000).subscribe(comments=>{
+        this.chartDatas = comments;
+        this.drawCanvas();
+      });
     }
     
   }

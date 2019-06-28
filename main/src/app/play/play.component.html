@@ -12,6 +12,7 @@
   <app-chart
     (chartClickEvent)="onReceiveSeekSecond($event)"
     [width]="canvasWidth"
-    [height]="canvasHeight">
+    [height]="canvasHeight"
+    [id]="(youtubeData$ | async).id">
   </app-chart>
 </div>
