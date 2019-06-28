@@ -6,7 +6,7 @@ class Comment:
     message: str
     author_name: str
     thumbnails: str
-    timestamp_msec: str
+    timestamp_msec: int
     timestamp_text: str
     purchase_amount: str
     movie_id: str
