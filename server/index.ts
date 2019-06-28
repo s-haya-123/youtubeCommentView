@@ -6,11 +6,15 @@ export const hello = (req: any,res:any) => {
 
 export const getComment = async (req:any,res:any) => {
     const db = new CommentDatabaseLocalPostgres()
-    const movieId = req.query.movie_id;
     const bin = "bin" in req.query ? Number(req.query.bin) : 30000;
-    const commets = await getComments(db,movieId);
-    const statics = takeStaticsOfComment(commets,bin, true);
-    res.status(200).send(statics);
+    if ("movie_id" in req.query) {
+        const movieId = req.query.movie_id;
+        const commets = await getComments(db,movieId);
+        const statics = takeStaticsOfComment(commets,bin, true);
+        res.status(200).send(statics);
+    } else  {
+        res.status(400).end();
+    }
 }
 
 async function getComments(db: CommentDatabase ,movieId: string): Promise<YoutubeCommentRow[]> {
