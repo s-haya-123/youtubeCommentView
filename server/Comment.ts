@@ -33,7 +33,7 @@ export class CommentDatabaseLocalPostgres implements CommentDatabase {
         return client;
     }
     private async getCommentsFromPg(client: Client, movieId: string):Promise<YoutubeCommentRow[]> {
-        const result = await client.query(`SELECT * FROM comment WHERE movie_id='${movieId}'`);
+        const result = await client.query(`SELECT * FROM comment WHERE movie_id='${movieId}' order by timestamp_msec asc`);
         return result.rows.map((row)=>{
             return new YoutubeCommentRow(row["id"],row["message"],row["author_name"],row["thumbnails"],row["timestamp_msec"],row["timestamp_text"],row["purchase_amount"],row["movie_id"]);
         });
