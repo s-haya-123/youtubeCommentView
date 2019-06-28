@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 export class CommentData {
   constructor(
@@ -12,7 +13,7 @@ export class CommentData {
 export class YoutubeData {
   constructor(
     public title: string,
-    public comments: CommentData[],
+    public id:String,
   ) {}
 }
 
@@ -27,13 +28,24 @@ export class YoutubeService {
     new CommentData(5,"2:00",120),
     new CommentData(3,"2:30",150),
   ]
-  private youtubeData: YoutubeData = new YoutubeData("はじめての料理配信【Cooking Simulator】",this.data)
-  constructor() { }
+  private youtubeData: YoutubeData = new YoutubeData("OUTLASTから逃げるな【#5】","juRmM7oa2Jg")
+  constructor(private http:HttpClient) { }
 
   getYoutubeData(): Observable<YoutubeData> {
     return new Observable((observer)=>{
       observer.next(this.youtubeData);
       return {unsubscribe() {}};
     })
+  }
+  getYoutubeComment(): Observable<CommentData[]> {
+    return new Observable( (obserber)=>{
+      this.http.get("http://localhost:8010/tensile-pixel-243512/us-central1/getComment?bin=60000\&movie_id=juRmM7oa2Jg")
+      .subscribe((datas: Array<any>)=>{
+        const commentDatas = datas.map(data=>{
+          return new CommentData(data["commentNumber"], data["label"], data["second"]);
+        });
+        obserber.next(commentDatas);
+      })
+    });
   }
 }

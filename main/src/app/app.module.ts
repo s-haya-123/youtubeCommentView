@@ -9,6 +9,7 @@ import { PlayComponent } from './play/play.component';
 import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
 import { ChartComponent } from './chart/chart.component';
 
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ChartComponent } from './chart/chart.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NgxYoutubePlayerModule.forRoot()
+    NgxYoutubePlayerModule.forRoot(),
+    HttpClientModule,
   ],
   providers: [YoutubeService],
   bootstrap: [AppComponent]

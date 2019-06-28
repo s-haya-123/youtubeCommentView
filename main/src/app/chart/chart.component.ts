@@ -34,9 +34,10 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private chartDatas:CommentData[];
 
   constructor(private youtubeService: YoutubeService) { 
-    youtubeService.getYoutubeData().subscribe( (youtubeData:YoutubeData) => {
-      this.chartDatas = youtubeData.comments;
-    })
+    youtubeService.getYoutubeComment().subscribe(comments=>{
+      this.chartDatas = comments;
+      this.drawCanvas();
+    });
   }
 
   ngOnChanges(){
@@ -48,6 +49,8 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   
   ngAfterViewInit() {
     // canvasを取得
+  }
+  private drawCanvas() {
     this.context = this.ref.nativeElement.getContext('2d');
     this.context.canvas.height = window.innerHeight / 6;
     let labels = this.chartDatas.map( (chartData: CommentData) => chartData.label );

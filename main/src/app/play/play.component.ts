@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 })
 export class PlayComponent implements OnInit {
   player: YT.Player;
-  private id: string = '7QzUKRnY6oU';
   private canvasWidth: number;
   private canvasHeight: number;
   private youtubeData$: Observable<YoutubeData>;

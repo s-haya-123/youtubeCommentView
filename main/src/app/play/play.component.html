@@ -1,6 +1,6 @@
 <div class="player">
   <youtube-player
-    [videoId]="id"
+    [videoId]="(youtubeData$ | async).id"
     (ready)="savePlayer($event)"
     (change)="onStateChange($event)">
   </youtube-player>
