@@ -10,12 +10,14 @@ import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
 import { ChartComponent } from './chart/chart.component';
 
 import { HttpClientModule } from '@angular/common/http';
+import { ListComponent } from './list/list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PlayComponent,
-    ChartComponent
+    ChartComponent,
+    ListComponent
   ],
   imports: [
     BrowserModule,
