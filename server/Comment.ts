@@ -1,4 +1,3 @@
-import { getComment } from './index';
 import { Client } from 'pg'; 
 export class YoutubeCommentRow {
     constructor(
@@ -6,10 +5,17 @@ export class YoutubeCommentRow {
         public message: string,
         public authorName: string,
         public tumbnails: string,
-        public timestampMsec: string,
+        public timestampMsec: number,
         public timestampText: string,
         public purchaseAmount: string,
         public movieId: string
+    ){}
+}
+export class YoutubeCommentStatics {
+    constructor(
+        public commentNumber: number,
+        public label: string,
+        public second: number
     ){}
 }
 
