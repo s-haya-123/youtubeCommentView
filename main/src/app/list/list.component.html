@@ -1,5 +1,5 @@
 <div class="list">
-    <div *ngFor="let thumbnail of thumbnails" class="thumbnail-wrap">
+    <div *ngFor="let thumbnail of thumbnails" class="thumbnail-wrap" (click)="movePlay()">
             <img class="thumbnail" src="http://img.youtube.com/vi/{{thumbnail.id}}/sddefault.jpg"/>
             <div class="title">{{thumbnail.title}}</div>
     </div>
