@@ -1,6 +1,6 @@
 <div class="list">
     <div *ngFor="let thumbnail of thumbnails" class="thumbnail-wrap">
-            <img class="thumbnail" [src]="thumbnail.url"/>
+            <img class="thumbnail" src="http://img.youtube.com/vi/{{thumbnail.id}}/sddefault.jpg"/>
             <div class="title">{{thumbnail.title}}</div>
     </div>
 </div>
