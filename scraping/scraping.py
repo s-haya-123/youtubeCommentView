@@ -1,9 +1,13 @@
 from bs4 import BeautifulSoup
+import re
 import json
 import requests
 from Comment import Comment
 from CommentDatabase import CommentDatabase
 from CommentDatabase import CommentDatabaseLocalPostgres
+from Movie import Movie
+from MovieDatabase import MovieDatabase
+from MovieDatabase import MovieDatabaseLocalPostgres
 
 def get_next_url_from_soup(soup):
     for iframe in soup.find_all("iframe"):
@@ -35,52 +39,60 @@ def get_comment_data(session,target_url):
     comment_data = get_comment_data_from_dict_comment(dict_comment)
     return (comment_data,next_url)
 
-def translate_comment_data_to_comment_dto(comment_data):
+def translate_comment_data_to_comment_dto(comment_data, movie_id):
     if "addChatItemAction" not in comment_data["replayChatItemAction"]["actions"][0]:
         return
     item = comment_data["replayChatItemAction"]["actions"][0]["addChatItemAction"]["item"]
     timestamp_msec = comment_data["replayChatItemAction"]["videoOffsetTimeMsec"]
     if "liveChatPaidMessageRenderer" in item:
-        return translate_live_paid_to_dto(item["liveChatPaidMessageRenderer"],timestamp_msec)
+        return translate_live_paid_to_dto(item["liveChatPaidMessageRenderer"],timestamp_msec,movie_id)
     elif "liveChatTextMessageRenderer" in item:
-        return translate_live_text_to_dto(item["liveChatTextMessageRenderer"],timestamp_msec)
+        return translate_live_text_to_dto(item["liveChatTextMessageRenderer"],timestamp_msec,movie_id)
     else:
         return 
 
-def translate_live_text_to_dto(live_text,timestamp_msec):
+def translate_live_text_to_dto(live_text,timestamp_msec,movie_id):
     id = live_text["id"]
     message = live_text["message"]["runs"][0]["text"]
     author_name = live_text["authorName"]["simpleText"]
     thumbnails = live_text["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_text["timestampText"]["simpleText"]
     purchase_amount = ""
-    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount)
+    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount,movie_id)
 
 
 
-def translate_live_paid_to_dto(live_paid,timestamp_msec):
+def translate_live_paid_to_dto(live_paid,timestamp_msec,movie_id):
     id = live_paid["id"]
     message =  live_paid["message"]["runs"][0]["text"] if "message" in live_paid else ""
     author_name = live_paid["authorName"]["simpleText"]
     thumbnails = live_paid["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_paid["timestampText"]["simpleText"]
     purchase_amount = live_paid["purchaseAmountText"]["simpleText"]
-    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount)
+    return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount,movie_id)
 
 def insert_comment(database: CommentDatabase, comment: Comment):
     database.upload_comment(comment)
 
-target_url = "https://www.youtube.com/watch?v=juRmM7oa2Jg"
+def insert_movie(database: MovieDatabase, movie: Movie):
+    database.upload_movie(movie)
+
+movie_id = "CiWwSenltbc"
+target_url = "https://www.youtube.com/watch?v=" + movie_id
 session = requests.Session()
 
 # まず動画ページにrequestsを実行しhtmlソースを手に入れてlive_chat_replayの先頭のurlを入手
 html = requests.get(target_url)
 soup = BeautifulSoup(html.text, "html.parser")
 next_url = get_next_url_from_soup(soup)
+title = re.search(r"(.*) - YouTube",soup.title.string).group(1)
+
+insert_movie(MovieDatabaseLocalPostgres(),Movie(movie_id,title))
+
 while(1):
     try:
         (comment_data,next_url) = get_comment_data(session,next_url)
-        comments = [data for data in [ translate_comment_data_to_comment_dto(data) for data in comment_data ] if data is not None]
+        comments = [data for data in [ translate_comment_data_to_comment_dto(data,movie_id) for data in comment_data ] if data is not None]
         database = CommentDatabaseLocalPostgres()
         for comment in comments:
             insert_comment(database,comment)
