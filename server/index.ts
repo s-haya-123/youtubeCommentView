@@ -1,4 +1,5 @@
 import { CommentDatabase, CommentDatabaseLocalPostgres, YoutubeCommentRow, YoutubeCommentStatics } from './Comment';
+import { Movie, MovieDatabase, MovieDatabaseLocalPostgres } from './Movie';
 export const hello = (req: any,res:any) => {
     console.log("hello ts");
     res.send();
@@ -16,6 +17,14 @@ export const getComment = async (req:any,res:any) => {
     } else  {
         res.status(400).end();
     }
+}
+export const getMovie = async (req:any,res:any) => {
+    const db = new MovieDatabaseLocalPostgres();
+    const movies = await getAllMovies(db);
+    res.status(200).send(movies);
+}
+async function getAllMovies(db: MovieDatabase): Promise<Movie[]> {
+    return db.getAllMovies();
 }
 
 async function getComments(db: CommentDatabase ,movieId: string): Promise<YoutubeCommentRow[]> {
