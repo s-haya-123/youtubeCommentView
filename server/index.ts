@@ -21,6 +21,7 @@ export const getComment = async (req:any,res:any) => {
 export const getMovie = async (req:any,res:any) => {
     const db = new MovieDatabaseLocalPostgres();
     const movies = await getAllMovies(db);
+    res.header('Access-Control-Allow-Origin', "*");
     res.status(200).send(movies);
 }
 async function getAllMovies(db: MovieDatabase): Promise<Movie[]> {
