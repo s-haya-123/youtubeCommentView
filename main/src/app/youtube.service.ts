@@ -21,8 +21,8 @@ export class YoutubeData {
   providedIn: 'root'
 })
 export class YoutubeService {
-  private youtubeData: YoutubeData = new YoutubeData("OUTLASTから逃げるな【#5】","juRmM7oa2Jg")
-  constructor(private http:HttpClient) { }
+  youtubeData: YoutubeData;
+  constructor(private http:HttpClient) {  }
 
   getYoutubeData(): Observable<YoutubeData> {
     return new Observable((observer)=>{

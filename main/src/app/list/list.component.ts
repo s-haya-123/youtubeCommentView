@@ -10,10 +10,6 @@ import { Observable } from 'rxjs';
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent implements OnInit {
-  private thumbnails: YoutubeData[] = [
-    new YoutubeData("title","juRmM7oa2Jg"),
-    new YoutubeData("title","juRmM7oa2Jg"),
-    new YoutubeData("title2","")];
   private thumbnails$: Observable<YoutubeData[]>
   constructor(private router: Router,private youtubeService: YoutubeService) {
     this.thumbnails$ = youtubeService.getAllMovie();
@@ -21,7 +17,8 @@ export class ListComponent implements OnInit {
 
   ngOnInit() {
   }
-  private movePlay() {
+  private movePlay(youtube: YoutubeData) {
+    this.youtubeService.youtubeData = youtube;
     this.router.navigate(["play"]);
   }
 
