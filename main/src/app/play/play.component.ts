@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
   selector: 'app-play',
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.scss'],
-  providers: [ YoutubeService ]
 })
 export class PlayComponent implements OnInit {
   player: YT.Player;

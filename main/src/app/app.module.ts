@@ -25,7 +25,7 @@ import { ListComponent } from './list/list.component';
     NgxYoutubePlayerModule.forRoot(),
     HttpClientModule,
   ],
-  providers: [YoutubeService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -12,10 +12,7 @@ class ChartElemet {
   selector: 'app-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
-  providers: [ YoutubeService ]
 })
-
-
 export class ChartComponent implements AfterViewInit,OnChanges {
 
   @ViewChild('canvas',{static: false})
