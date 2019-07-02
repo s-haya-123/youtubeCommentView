@@ -25,11 +25,8 @@ export class YoutubeService {
   youtubeData: YoutubeData;
   constructor(private http:HttpClient) {  }
 
-  getYoutubeData(): Observable<YoutubeData> {
-    return new Observable((observer)=>{
-      observer.next(this.youtubeData);
-      return {unsubscribe() {}};
-    })
+  getYoutubeData(): YoutubeData {
+    return this.youtubeData;
   }
   getYoutubeComment(id: string, bin: number): Observable<CommentData[]> {
     return new Observable( (obserber)=>{
@@ -39,6 +36,7 @@ export class YoutubeService {
           return new CommentData(data["commentNumber"], data["label"], data["second"], data["messages"]);
         });
         obserber.next(commentDatas);
+        return {unsubscribe() {}};
       })
     });
   }
@@ -50,6 +48,7 @@ export class YoutubeService {
           return new YoutubeData(data["title"],data["id"]);
         });
         observer.next(youtubeData);
+        return {unsubscribe() {}};
       })
     });
   }

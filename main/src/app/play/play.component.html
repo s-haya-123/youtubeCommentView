@@ -1,18 +1,18 @@
 <div class="player">
   <youtube-player
-    [videoId]="(youtubeData$ | async).id"
+    [videoId]="youtubeData.id"
     (ready)="savePlayer($event)"
     (change)="onStateChange($event)">
   </youtube-player>
   <div class="title-contain" [ngStyle]="{'width':canvasWidth+'px'}">
     <div class="title">
-      {{ (youtubeData$ | async).title }}
+      {{ youtubeData.title }}
     </div>
   </div>
   <app-chart
     (chartClickEvent)="onReceiveSeekSecond($event)"
     [width]="canvasWidth"
     [height]="canvasHeight"
-    [id]="(youtubeData$ | async).id">
+    [id]="youtubeData.id">
   </app-chart>
 </div>

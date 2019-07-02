@@ -1,6 +1,6 @@
 import { YoutubeService, YoutubeData } from './../youtube.service';
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Location } from '@angular/common'
 
 @Component({
   selector: 'app-play',
@@ -11,12 +11,15 @@ export class PlayComponent implements OnInit {
   player: YT.Player;
   private canvasWidth: number;
   private canvasHeight: number;
-  private youtubeData$: Observable<YoutubeData>;
+  private youtubeData: YoutubeData;
   private title:string;
-  constructor(private youtubeService: YoutubeService) { } 
+  constructor(private youtubeService: YoutubeService, private location: Location) { } 
   ngOnInit() {
+    this.youtubeData = this.youtubeService.getYoutubeData();
+    if(this.youtubeData === undefined) {
+      this.location.back();
+    }
     this.setCanvasSize();
-    this.youtubeData$ = this.youtubeService.getYoutubeData();
   }
 
   savePlayer(player) {
