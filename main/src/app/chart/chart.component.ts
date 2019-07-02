@@ -30,6 +30,9 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private color = [ 'rgba(255,99,132,1)' ];
   private label = "コメント数";
   private chartDatas:CommentData[];
+  private messages: string[] = [];
+  private messageRange = 60000;
+
 
   constructor(private youtubeService: YoutubeService) { 
     
@@ -37,7 +40,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
 
   ngOnChanges(changes: any){
     if( changes.id) {
-      this.youtubeService.getYoutubeComment(this.id,30000).subscribe(comments=>{
+      this.youtubeService.getYoutubeComment(this.id,this.messageRange).subscribe(comments=>{
         this.chartDatas = comments;
         this.drawCanvas();
       });
@@ -79,7 +82,8 @@ export class ChartComponent implements AfterViewInit,OnChanges {
           if (element.length > 0){
             let index = element[0]._index;
             let chart = this.chartDatas[index];
-            this.chartClickEvent.emit(chart.second)
+            this.messages = this.chartDatas[index].messages;
+            this.chartClickEvent.emit(chart.second);
           }
         }
       }

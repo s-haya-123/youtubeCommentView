@@ -6,7 +6,8 @@ export class CommentData {
   constructor(
     public commentNumber: number,
     public label: string,
-    public second: number
+    public second: number,
+    public messages: string[]
     ) {}
 }
 
@@ -35,7 +36,7 @@ export class YoutubeService {
       this.http.get(`http://localhost:8010/tensile-pixel-243512/us-central1/getComment?bin=${bin}\&movie_id=${id}`)
       .subscribe((datas: Array<any>)=>{
         const commentDatas = datas.map(data=>{
-          return new CommentData(data["commentNumber"], data["label"], data["second"]);
+          return new CommentData(data["commentNumber"], data["label"], data["second"], data["messages"]);
         });
         obserber.next(commentDatas);
       })
