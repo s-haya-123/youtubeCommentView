@@ -1,7 +1,12 @@
 from abc import ABC
 from abc import abstractmethod
-from Movie import Movie
 import psycopg2
+import dataclasses
+
+@dataclasses.dataclass
+class Movie:
+    id: str
+    title: str
 
 class MovieDatabase(ABC):
     @abstractmethod

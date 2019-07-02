@@ -2,10 +2,10 @@ from bs4 import BeautifulSoup
 import re
 import json
 import requests
-from Comment import Comment
+from CommentDatabase import Comment
 from CommentDatabase import CommentDatabase
 from CommentDatabase import CommentDatabaseLocalPostgres
-from Movie import Movie
+from MovieDatabase import Movie
 from MovieDatabase import MovieDatabase
 from MovieDatabase import MovieDatabaseLocalPostgres
 
