@@ -32,23 +32,37 @@ async function getComments(db: CommentDatabase ,movieId: string): Promise<Youtub
     return db.getComments(movieId);
 }
 
-function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isExcludeBeforeComment: boolean) {
+function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isExcludeBeforeComment: boolean):YoutubeCommentStatics[] {
     const binRange = calcBinRange(comments,bin);
-    const results = new Array(binRange).fill(0);
-    return comments.reduce((acc: number[],comment: YoutubeCommentRow) => {
-        if (isExcludeBeforeComment && comment.timestampMsec === 0) {
-            return acc;
-        } else {
-            const index = Math.floor(comment.timestampMsec / bin);
-            acc[index] += 1;
-            return acc;
+    const results: YoutubeCommentStatics[] = new Array(binRange).fill({}).map( (_)=> {return new YoutubeCommentStatics(0,"",0,[]) } );
+    const takeStatics: (arg1: YoutubeCommentStatics[], arg2: YoutubeCommentRow)=>YoutubeCommentStatics[]
+        = (acc,comment)=>{
+            if (isExcludeBeforeComment && comment.timestampMsec === 0) {
+                return acc;
+            } else {
+                const index = Math.floor(comment.timestampMsec / bin);
+                const target = acc[index];
+                target.commentNumber += 1;
+                target.messages.push(comment.message);
+                return acc;
+            }
+    }
+    const mapStatics: (arg1: YoutubeCommentStatics, arg2: number)=> YoutubeCommentStatics
+        = (commentStatics,index) =>{
+            const seconds = Math.floor(bin / 1000) * (index + 1);
+            const secondsText = `0${seconds % 60}`.slice(-2);
+            const label = `${Math.floor(seconds / 60)}:${secondsText}`;
+            commentStatics.second = seconds;
+            commentStatics.label = label
+            return commentStatics;
         }
-    }, results).map((commentNumber,index)=>{
-        const seconds = Math.floor(bin / 1000) * (index + 1);
-        const secondsText = `0${seconds % 60}`.slice(-2);
-        const label = `${Math.floor(seconds / 60)}:${secondsText}`;
-        return new YoutubeCommentStatics(commentNumber,label,seconds);
-    });
+    return comments.reduce(takeStatics, results).map(mapStatics);
+    // .map((commentNumber,index)=>{
+    //     const seconds = Math.floor(bin / 1000) * (index + 1);
+    //     const secondsText = `0${seconds % 60}`.slice(-2);
+    //     const label = `${Math.floor(seconds / 60)}:${secondsText}`;
+    //     return new YoutubeCommentStatics(commentNumber,label,seconds);
+    // });
 }
 function calcBinRange(comments: YoutubeCommentRow[], binMsec: number): number {
     const maxTimestamp:number = comments.slice(-1)[0].timestampMsec;

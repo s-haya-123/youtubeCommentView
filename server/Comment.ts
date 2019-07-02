@@ -15,7 +15,8 @@ export class YoutubeCommentStatics {
     constructor(
         public commentNumber: number,
         public label: string,
-        public second: number
+        public second: number,
+        public messages: string[]
     ){}
 }
 
