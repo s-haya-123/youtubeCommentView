@@ -14,11 +14,8 @@ class MovieDatabase(ABC):
         pass
 
 class MovieDatabaseLocalPostgres(MovieDatabase):
-    def upload_movie(self, movie: Movie):
-        conn = psycopg2.connect("host=localhost port=5432 dbname=postgres user=postgres password=secret")
+    def upload_movie(self, movie: Movie, conn:psycopg2.connect):
         cur = conn.cursor()
         datas = (movie.id, movie.title)
         cur.execute("INSERT INTO movie(id,title) VALUES (%s,%s);",datas)
         conn.commit()
-        cur.close()
-        conn.close()

@@ -2,12 +2,14 @@ from bs4 import BeautifulSoup
 import re
 import json
 import requests
+import psycopg2
 from CommentDatabase import Comment
 from CommentDatabase import CommentDatabase
 from CommentDatabase import CommentDatabaseLocalPostgres
 from MovieDatabase import Movie
 from MovieDatabase import MovieDatabase
 from MovieDatabase import MovieDatabaseLocalPostgres
+from typing import List
 
 def get_next_url_from_soup(soup):
     for iframe in soup.find_all("iframe"):
@@ -71,15 +73,17 @@ def translate_live_paid_to_dto(live_paid,timestamp_msec,movie_id):
     purchase_amount = live_paid["purchaseAmountText"]["simpleText"]
     return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount,movie_id)
 
-def insert_comment(database: CommentDatabase, comment: Comment):
-    database.upload_comment(comment)
+def insert_comment(database: CommentDatabase, comment: Comment, conn: psycopg2.connect):
+    database.upload_comment(comment,conn)
+def insert_comments(database: CommentDatabase, comments: List[Comment], conn: psycopg2.connect):
+    database.upload_comments(comments, conn)
+def insert_movie(database: MovieDatabase, movie: Movie, conn: psycopg2.connect):
+    database.upload_movie(movie,conn)
 
-def insert_movie(database: MovieDatabase, movie: Movie):
-    database.upload_movie(movie)
-
-movie_id = "CiWwSenltbc"
+movie_id = "2WkSXMciRGU"
 target_url = "https://www.youtube.com/watch?v=" + movie_id
 session = requests.Session()
+conn = psycopg2.connect("host=localhost port=5432 dbname=postgres user=postgres password=secret")
 
 # まず動画ページにrequestsを実行しhtmlソースを手に入れてlive_chat_replayの先頭のurlを入手
 html = requests.get(target_url)
@@ -87,14 +91,16 @@ soup = BeautifulSoup(html.text, "html.parser")
 next_url = get_next_url_from_soup(soup)
 title = re.search(r"(.*) - YouTube",soup.title.string).group(1)
 
-insert_movie(MovieDatabaseLocalPostgres(),Movie(movie_id,title))
-
+insert_movie(MovieDatabaseLocalPostgres(),Movie(movie_id,title),conn)
+comments_insert = []
 while(1):
     try:
         (comment_data,next_url) = get_comment_data(session,next_url)
         comments = [data for data in [ translate_comment_data_to_comment_dto(data,movie_id) for data in comment_data ] if data is not None]
-        database = CommentDatabaseLocalPostgres()
-        for comment in comments:
-            insert_comment(database,comment)
+        comments_insert.extend(comments)
     except:
         break
+
+
+database = CommentDatabaseLocalPostgres()
+insert_comments(database,comments_insert,conn)
