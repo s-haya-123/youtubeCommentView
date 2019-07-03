@@ -8,10 +8,11 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "pg": "^7.11.0"
+  },
   "devDependencies": {
     "@types/pg": "^7.4.14",
-    "pg": "^7.11.0",
     "typescript": "^3.5.2"
   }
 }
