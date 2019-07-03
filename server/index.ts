@@ -1,16 +1,33 @@
-import { CommentDatabase, CommentDatabaseLocalPostgres, YoutubeCommentRow, YoutubeCommentStatics } from './Comment';
-import { Movie, MovieDatabase, MovieDatabaseLocalPostgres } from './Movie';
+import { CommentDatabase, CommentDatabasePostgres, YoutubeCommentRow, YoutubeCommentStatics } from './Comment';
+import { Movie, MovieDatabase, MovieDatabasePostgres } from './Movie';
+import { PoolConfig, Pool, Client } from 'pg';
 export const hello = (req: any,res:any) => {
     console.log("hello ts");
     res.send();
 }
+const connectionName = process.env.INSTANCE_CONNECTION_NAME;
+const dbUser = process.env.SQL_USER;
+const dbPassword = process.env.SQL_PASSWORD;
+const dbName = process.env.SQL_NAM;
+const pgConfig: PoolConfig = {
+    max: 1,
+    user: dbUser,
+    password: dbPassword,
+    database: dbName,
+    host: `/cloudsql/${connectionName}`
+};
+
+let client: Client | null = null;
 
 export const getComment = async (req:any,res:any) => {
-    const db = new CommentDatabaseLocalPostgres()
+    const db = new CommentDatabasePostgres();
+    if (!client) {
+        client = await db.getPgClient(pgConfig);
+    }
     const bin = "bin" in req.query ? Number(req.query.bin) : 30000;
     if ("movie_id" in req.query) {
         const movieId = req.query.movie_id;
-        const commets = await getComments(db,movieId);
+        const commets = await getComments(db,client,movieId);
         const statics = takeStaticsOfComment(commets,bin, true);
         res.header('Access-Control-Allow-Origin', "*");
         res.status(200).send(statics);
@@ -19,17 +36,20 @@ export const getComment = async (req:any,res:any) => {
     }
 }
 export const getMovie = async (req:any,res:any) => {
-    const db = new MovieDatabaseLocalPostgres();
-    const movies = await getAllMovies(db);
+    const db = new MovieDatabasePostgres();
+    if (!client) {
+        client = await db.getPgClient(pgConfig);
+    }
+    const movies = await getAllMovies(db, client);
     res.header('Access-Control-Allow-Origin', "*");
     res.status(200).send(movies);
 }
-async function getAllMovies(db: MovieDatabase): Promise<Movie[]> {
-    return db.getAllMovies();
+async function getAllMovies(db: MovieDatabase, client: Client): Promise<Movie[]> {
+    return db.getAllMovies(client);
 }
 
-async function getComments(db: CommentDatabase ,movieId: string): Promise<YoutubeCommentRow[]> {
-    return db.getComments(movieId);
+async function getComments(db: CommentDatabase,client:Client ,movieId: string): Promise<YoutubeCommentRow[]> {
+    return db.getComments(client,movieId);
 }
 
 function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isExcludeBeforeComment: boolean):YoutubeCommentStatics[] {
@@ -49,7 +69,7 @@ function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isEx
     }
     const mapStatics: (arg1: YoutubeCommentStatics, arg2: number)=> YoutubeCommentStatics
         = (commentStatics,index) =>{
-            const seconds = Math.floor(bin / 1000) * (index + 1);
+            const seconds = Math.floor(bin / 1000) * index;
             const secondsText = `0${seconds % 60}`.slice(-2);
             const label = `${Math.floor(seconds / 60)}:${secondsText}`;
             commentStatics.second = seconds;
@@ -57,12 +77,6 @@ function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isEx
             return commentStatics;
         }
     return comments.reduce(takeStatics, results).map(mapStatics);
-    // .map((commentNumber,index)=>{
-    //     const seconds = Math.floor(bin / 1000) * (index + 1);
-    //     const secondsText = `0${seconds % 60}`.slice(-2);
-    //     const label = `${Math.floor(seconds / 60)}:${secondsText}`;
-    //     return new YoutubeCommentStatics(commentNumber,label,seconds);
-    // });
 }
 function calcBinRange(comments: YoutubeCommentRow[], binMsec: number): number {
     const maxTimestamp:number = comments.slice(-1)[0].timestampMsec;

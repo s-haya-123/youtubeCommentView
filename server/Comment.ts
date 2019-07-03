@@ -1,4 +1,4 @@
-import { Client } from 'pg'; 
+import { Client, PoolConfig } from 'pg'; 
 export class YoutubeCommentRow {
     constructor(
         public id: string,
@@ -21,21 +21,15 @@ export class YoutubeCommentStatics {
 }
 
 export interface CommentDatabase {
-    getComments(movieId: string): Promise<YoutubeCommentRow[]>;
+    getComments(client:Client, movieId: string): Promise<YoutubeCommentRow[]>;
 }
 
-export class CommentDatabaseLocalPostgres implements CommentDatabase {
-    async getComments(movieId: string): Promise<YoutubeCommentRow[]>{
-        const client = await this.getPgClient();
+export class CommentDatabasePostgres implements CommentDatabase {
+    async getComments(client: Client, movieId: string): Promise<YoutubeCommentRow[]>{
         return this.getCommentsFromPg(client,movieId);
     }
-    private async getPgClient(): Promise<Client> {
-        const client = new Client({
-            host: 'localhost',
-            database: 'postgres',
-            user: 'postgres',
-            password: 'secret'
-        });
+    async getPgClient(config: PoolConfig): Promise<Client> {
+        const client = new Client(config);
         await client.connect();
         return client;
     }

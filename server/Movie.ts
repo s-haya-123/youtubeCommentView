@@ -1,4 +1,4 @@
-import { Client } from 'pg'; 
+import { Client, PoolConfig } from 'pg'; 
 export class Movie {
     constructor(
         public id: string,
@@ -7,21 +7,15 @@ export class Movie {
 }
 
 export interface MovieDatabase {
-    getAllMovies(): Promise<Movie[]>
+    getAllMovies(client:Client): Promise<Movie[]>
 }
 
-export class MovieDatabaseLocalPostgres implements MovieDatabase {
-    async getAllMovies(): Promise<Movie[]> {
-        const client = await this.getPgClient();
+export class MovieDatabasePostgres implements MovieDatabase {
+    async getAllMovies(client:Client): Promise<Movie[]> {
         return this.getMoviesFromPg(client);
     }
-    private async getPgClient(): Promise<Client> {
-        const client = new Client({
-            host: 'localhost',
-            database: 'postgres',
-            user: 'postgres',
-            password: 'secret'
-        });
+    async getPgClient(config: PoolConfig): Promise<Client> {
+        const client = new Client(config);
         await client.connect();
         return client;
     }
