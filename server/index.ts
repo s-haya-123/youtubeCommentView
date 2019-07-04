@@ -1,20 +1,17 @@
 import { CommentDatabase, CommentDatabasePostgres, YoutubeCommentRow, YoutubeCommentStatics } from './Comment';
 import { Movie, MovieDatabase, MovieDatabasePostgres } from './Movie';
 import { PoolConfig, Pool, Client } from 'pg';
-export const hello = (req: any,res:any) => {
-    console.log("hello ts");
-    res.send();
-}
+
 const connectionName = process.env.INSTANCE_CONNECTION_NAME;
-const dbUser = process.env.SQL_USER;
-const dbPassword = process.env.SQL_PASSWORD;
-const dbName = process.env.SQL_NAM;
+const dbUser = process.env.SQL_USER || "postgres";
+const dbPassword = process.env.SQL_PASSWORD || "secret";
+const dbName = process.env.SQL_NAM || "postgres";
 const pgConfig: PoolConfig = {
     max: 1,
     user: dbUser,
     password: dbPassword,
     database: dbName,
-    host: `/cloudsql/${connectionName}`
+    host: connectionName ? `/cloudsql/${connectionName}` : "localhost"
 };
 
 let client: Client | null = null;
