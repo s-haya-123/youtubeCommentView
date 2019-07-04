@@ -30,7 +30,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private color = [ 'rgba(255,99,132,1)' ];
   private label = "コメント数";
   private chartDatas:CommentData[];
-  private messages: string[] = [];
+  messages: string[] = [];
   private messageRange = 60000;
 
 

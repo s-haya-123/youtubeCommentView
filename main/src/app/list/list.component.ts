@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent implements OnInit {
-  private thumbnails$: Observable<YoutubeData[]>
+  thumbnails$: Observable<YoutubeData[]>
   constructor(private router: Router,private youtubeService: YoutubeService) {
     this.thumbnails$ = youtubeService.getAllMovie();
   }

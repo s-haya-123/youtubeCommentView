@@ -9,10 +9,10 @@ import { Location } from '@angular/common'
 })
 export class PlayComponent implements OnInit {
   player: YT.Player;
-  private canvasWidth: number;
-  private canvasHeight: number;
-  private youtubeData: YoutubeData;
-  private title:string;
+  canvasWidth: number;
+  canvasHeight: number;
+  youtubeData: YoutubeData;
+  title:string;
   constructor(private youtubeService: YoutubeService, private location: Location) { } 
   ngOnInit() {
     this.youtubeData = this.youtubeService.getYoutubeData();

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { environment } from './../environments/environment';
 
 export class CommentData {
   constructor(
@@ -30,7 +31,7 @@ export class YoutubeService {
   }
   getYoutubeComment(id: string, bin: number): Observable<CommentData[]> {
     return new Observable( (obserber)=>{
-      this.http.get(`http://localhost:8010/tensile-pixel-243512/us-central1/getComment?bin=${bin}\&movie_id=${id}`)
+      this.http.get(`${environment.apiUrl}/getComment?bin=${bin}\&movie_id=${id}`)
       .subscribe((datas: Array<any>)=>{
         const commentDatas = datas.map(data=>{
           return new CommentData(data["commentNumber"], data["label"], data["second"], data["messages"]);
@@ -42,7 +43,7 @@ export class YoutubeService {
   }
   getAllMovie(): Observable<YoutubeData[]> {
     return new Observable( (observer)=>{
-      this.http.get("http://localhost:8010/tensile-pixel-243512/us-central1/getMovie")
+      this.http.get(`${environment.apiUrl}/getMovie`)
       .subscribe((datas: Array<any>)=>{
         const youtubeData = datas.map(data=>{
           return new YoutubeData(data["title"],data["id"]);
