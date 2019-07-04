@@ -11,15 +11,17 @@ export class PlayComponent implements OnInit {
   player: YT.Player;
   canvasWidth: number;
   canvasHeight: number;
-  youtubeData: YoutubeData;
+  youtubeData: YoutubeData = new YoutubeData("","");
   title:string;
   constructor(private youtubeService: YoutubeService, private location: Location) { } 
   ngOnInit() {
-    this.youtubeData = this.youtubeService.getYoutubeData();
-    if(this.youtubeData === undefined) {
+    if(this.youtubeService.getYoutubeData()===undefined) {
       this.location.back();
+    } else {
+      this.youtubeData = this.youtubeService.getYoutubeData();
+
+      this.setCanvasSize();
     }
-    this.setCanvasSize();
   }
 
   savePlayer(player) {

@@ -39,7 +39,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   }
 
   ngOnChanges(changes: any){
-    if( changes.id) {
+    if( changes.id && this.id != "") {
       this.youtubeService.getYoutubeComment(this.id,this.messageRange).subscribe(comments=>{
         this.chartDatas = comments;
         this.drawCanvas();
