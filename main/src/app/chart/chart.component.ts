@@ -44,8 +44,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
         this.chartDatas = comments;
         this.drawCanvas();
       });
-    }
-    
+    }    
   }
   
   ngAfterViewInit() {
@@ -53,7 +52,6 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   }
   private drawCanvas() {
     this.context = this.ref.nativeElement.getContext('2d');
-    this.context.canvas.height = window.innerHeight / 6;
     let labels = this.chartDatas.map( (chartData: CommentData) => chartData.label );
     let datas = this.chartDatas.map( (chartData: CommentData)=> chartData.commentNumber);
 

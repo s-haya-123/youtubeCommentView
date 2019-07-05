@@ -1,4 +1,7 @@
-<canvas #canvas class="ras-chart" [width]="width" [height]="height"></canvas>
+<div class="chart-container" [ngStyle]="{'width':width+'px','height': height+'px'}">
+        <canvas #canvas class="ras-chart"></canvas>
+</div>
+
 <h2>コメント一覧</h2>
 <div class="comment-list">
     <div *ngFor="let message of messages" class="comment">

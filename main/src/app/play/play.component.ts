@@ -19,7 +19,6 @@ export class PlayComponent implements OnInit {
       this.location.back();
     } else {
       this.youtubeData = this.youtubeService.getYoutubeData();
-
       this.setCanvasSize();
     }
   }
@@ -27,10 +26,8 @@ export class PlayComponent implements OnInit {
   savePlayer(player) {
     this.player = player;
     this.setPlayerSize();
-    console.log('player instance', player);
   }
   onStateChange(event) {
-    console.log('player state', event.data);
   }
   onReceiveSeekSecond(second: number) {
     this.player.seekTo(second, true);
@@ -38,6 +35,7 @@ export class PlayComponent implements OnInit {
   @HostListener('window:resize',['$event'])
   onresize(_){
     this.setPlayerSize();
+    this.setCanvasSize();
   }
 
   private setPlayerSize() {
@@ -47,7 +45,6 @@ export class PlayComponent implements OnInit {
   }
   private setCanvasSize() {
     this.canvasWidth = window.innerWidth * 2 / 3;
-    this.canvasHeight = 320;
+    this.canvasHeight = window.innerWidth / 3;
   }
-
 }
