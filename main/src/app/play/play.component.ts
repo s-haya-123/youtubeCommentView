@@ -39,12 +39,12 @@ export class PlayComponent implements OnInit {
   }
 
   private setPlayerSize() {
-    let playerWidth = window.innerWidth * 2 / 3;
+    let playerWidth = window.innerWidth * 4 / 5;
     let playerHeight = window.innerHeight / 2;
     this.player.setSize(playerWidth,playerHeight);
   }
   private setCanvasSize() {
-    this.canvasWidth = window.innerWidth * 2 / 3;
-    this.canvasHeight = window.innerWidth / 3;
+    this.canvasWidth = window.innerWidth * 4 / 5;
+    this.canvasHeight = window.innerWidth / 2;
   }
 }

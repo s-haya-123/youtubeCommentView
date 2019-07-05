@@ -5,8 +5,10 @@
 .comment-list {
     display: flex;
     flex-wrap: wrap;
+    width: 80%;
+    margin: auto;
     .comment {
         padding: 0.5rem;
-        width: 23%;
+        width: 21%;
     }
 }
