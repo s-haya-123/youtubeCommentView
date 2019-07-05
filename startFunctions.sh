@@ -1,4 +1,4 @@
 #!/bin/bash
 
 (cd ./scraping; docker-compose up -d)
-(cd ./server; nodebrew use 8;functions start)
+(cd ./server; nodebrew use 8;functions start; nodebrew use 11)
