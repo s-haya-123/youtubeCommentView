@@ -29,12 +29,22 @@ def youtube_search_completed(channel_id,developer_key,next_token=None):
     return (videos,token)
 
 
+def search_all_archive(channel_id,developer_key):
+    return_list = []
+    token=None
+    while True:
+        (archive_list,token) = youtube_search_completed(channel_id,developer_key,token)
+        return_list.extend(archive_list)
+        if token == None:
+            break
+    return return_list
+
 if __name__ == "__main__":
     arges = sys.argv
     channel_id=arges[1]
     developer_key=arges[2]
 
     try:
-        test = youtube_search_completed(channel_id,developer_key)
+        test=search_all_archive(channel_id,developer_key)
     except HttpError as e:
         print ("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
