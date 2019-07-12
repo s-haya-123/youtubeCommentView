@@ -3,14 +3,14 @@
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 from oauth2client.tools import argparser
+import sys
 
-DEVELOPER_KEY = ""
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
 # return: ( Array<(title,id)>, token )
-def youtube_search_completed(channel_id,next_token=None):
-    youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,developerKey=DEVELOPER_KEY)
+def youtube_search_completed(channel_id,developer_key,next_token=None):
+    youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,developerKey=developer_key)
 
     search_response = youtube.search().list(
         channelId=channel_id,
@@ -30,9 +30,11 @@ def youtube_search_completed(channel_id,next_token=None):
 
 
 if __name__ == "__main__":
-    channel_id="UCD-miitqNY3nyukJ4Fnf4_A"
+    arges = sys.argv
+    channel_id=arges[1]
+    developer_key=arges[2]
 
     try:
-        test = youtube_search_completed(channel_id)
+        test = youtube_search_completed(channel_id,developer_key)
     except HttpError as e:
         print ("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
