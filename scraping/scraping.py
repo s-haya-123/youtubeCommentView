@@ -10,6 +10,9 @@ from MovieDatabase import Movie
 from MovieDatabase import MovieDatabase
 from MovieDatabase import MovieDatabaseLocalPostgres
 from typing import List
+import searchYoutube
+import sys
+import ast
 
 def get_next_url_from_soup(soup):
     for iframe in soup.find_all("iframe"):
@@ -18,19 +21,26 @@ def get_next_url_from_soup(soup):
     return
 
 def get_next_url_from_dict_comment(dict_comment):
-    continue_url = dict_comment["continuationContents"]["liveChatContinuation"]["continuations"][0]["liveChatReplayContinuationData"]["continuation"]
-    return "https://www.youtube.com/live_chat_replay?continuation=" + continue_url
+    if "liveChatReplayContinuationData" in dict_comment["continuationContents"]["liveChatContinuation"]["continuations"][0]:
+        continue_url = dict_comment["continuationContents"]["liveChatContinuation"]["continuations"][0]["liveChatReplayContinuationData"]["continuation"]
+        return "https://www.youtube.com/live_chat_replay?continuation=" + continue_url
+    else:
+        return None
 
 def get_comment_data_from_dict_comment(dict_comment):
-    return dict_comment["continuationContents"]["liveChatContinuation"]["actions"][1:]
+    if "actions" in dict_comment["continuationContents"]["liveChatContinuation"]:
+        return dict_comment["continuationContents"]["liveChatContinuation"]["actions"][1:]
+    else:
+        return None
     
 def get_dict_comment(soup):
     dict_str = ""
     for scrp in soup.find_all("script"):
         if "window[\"ytInitialData\"]" in scrp.text:
-            dict_str = scrp.text.split(" = ")[1]
+            split_text = scrp.text.split(" = ")
+            dict_str = " = ".join(split_text[1:])
     dict_str = dict_str.replace("false","False").replace("true","True").rstrip("  \n;")
-    return eval(dict_str)
+    return ast.literal_eval(dict_str)
 
 def get_comment_data(session,target_url):
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'}
@@ -55,7 +65,10 @@ def translate_comment_data_to_comment_dto(comment_data, movie_id):
 
 def translate_live_text_to_dto(live_text,timestamp_msec,movie_id):
     id = live_text["id"]
-    message = live_text["message"]["runs"][0]["text"]
+    if "text" in live_text["message"]["runs"][0]:
+        message = live_text["message"]["runs"][0]["text"]
+    elif "emoji" in live_text["message"]["runs"][0]:
+        message = live_text["message"]["runs"][0]["emoji"]["searchTerms"][0]
     author_name = live_text["authorName"]["simpleText"]
     thumbnails = live_text["authorPhoto"]["thumbnails"][0]["url"]
     timestamp_text = live_text["timestampText"]["simpleText"]
@@ -79,28 +92,45 @@ def insert_comments(database: CommentDatabase, comments: List[Comment], conn: ps
     database.upload_comments(comments, conn)
 def insert_movie(database: MovieDatabase, movie: Movie, conn: psycopg2.connect):
     database.upload_movie(movie,conn)
+def select_movie(database: MovieDatabase, conn: psycopg2.connect):
+    return database.select_movies(conn)
 
-movie_id = "2WkSXMciRGU"
-target_url = "https://www.youtube.com/watch?v=" + movie_id
-session = requests.Session()
-conn = psycopg2.connect("host=localhost port=5432 dbname=postgres user=postgres password=secret")
+def insert_all_comments(movie_id,password):
+    target_url = "https://www.youtube.com/watch?v=" + movie_id
+    session = requests.Session()
+    conn = psycopg2.connect("host=localhost port=3306 dbname=postgres user=postgres password=%s" % password)
+    movie_id_list = select_movie(MovieDatabaseLocalPostgres(),conn)
+    if movie_id in movie_id_list:
+        print("id is already exist. skip.")
+        return
+    html = requests.get(target_url)
+    soup = BeautifulSoup(html.text, "html.parser")
+    next_url = get_next_url_from_soup(soup)
+    title = re.search(r"(.*) - YouTube",soup.title.string).group(1)
 
-# まず動画ページにrequestsを実行しhtmlソースを手に入れてlive_chat_replayの先頭のurlを入手
-html = requests.get(target_url)
-soup = BeautifulSoup(html.text, "html.parser")
-next_url = get_next_url_from_soup(soup)
-title = re.search(r"(.*) - YouTube",soup.title.string).group(1)
+    comments_insert = []
+    while True:
+            if next_url is None:
+                break
+            (comment_data,next_url) = get_comment_data(session,next_url)
+            if comment_data is None:
+                break
+            comments = [data for data in [ translate_comment_data_to_comment_dto(data,movie_id) for data in comment_data ] if data is not None]
+            comments_insert.extend(comments)
+    
+    database = CommentDatabaseLocalPostgres()
+    insert_movie(MovieDatabaseLocalPostgres(),Movie(movie_id,title),conn)
+    insert_comments(database,comments_insert,conn)
 
-insert_movie(MovieDatabaseLocalPostgres(),Movie(movie_id,title),conn)
-comments_insert = []
-while(1):
-    try:
-        (comment_data,next_url) = get_comment_data(session,next_url)
-        comments = [data for data in [ translate_comment_data_to_comment_dto(data,movie_id) for data in comment_data ] if data is not None]
-        comments_insert.extend(comments)
-    except:
-        break
+    conn.close()
 
-
-database = CommentDatabaseLocalPostgres()
-insert_comments(database,comments_insert,conn)
+if __name__ == "__main__":
+    arges = sys.argv
+    channel_id = arges[1]
+    developer_key=arges[2]
+    postgres_password = arges[3]
+    id_list = searchYoutube.search_all_archive(channel_id,developer_key)
+    
+    for (title,movie_id) in id_list:
+        print("title: %s" % (title))
+        insert_all_comments(movie_id,postgres_password)
