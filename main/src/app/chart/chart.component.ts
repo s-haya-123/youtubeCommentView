@@ -31,7 +31,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   private label = "コメント数";
   private chartDatas:CommentData[];
   messages: string[] = [];
-  private messageRange = 60000;
+  private messageRange = 30000;
   private targetColor = 'rgba(204,0,51, 0.2)';
   private otherColor = ' rgba(0,0,0, 0.1)';
 
@@ -76,6 +76,13 @@ export class ChartComponent implements AfterViewInit,OnChanges {
       options: {
         tooltips: {
           mode: 'nearest'
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              suggestedMin: [...datas].sort()[0] - 10
+            }
+          }]
         },
         onClick:(event,element:ChartElemet[])=>{
           if (element.length > 0){
