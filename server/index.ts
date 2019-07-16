@@ -33,6 +33,7 @@ export const getComment = async (req:any,res:any) => {
         res.status(400).end();
     }
 }
+
 export const getMovie = async (req:any,res:any) => {
     const db = new MovieDatabasePostgres();
     if (!client) {
@@ -93,7 +94,15 @@ function takeStaticsOfCommentFromDifferential(comments: YoutubeCommentRow[], thr
         .filter((value)=>{
             const dComment = value.messages.length / range * 1000;
             return dComment >= threshold
-        });
+        }).reduce((array: YoutubeCommentStatics[],current:YoutubeCommentStatics)=>{
+            const index = array.findIndex((value)=>value.second > current.second - range / 1000 && value.second < current.second + range / 1000);
+            if ( index >= 0 && current.commentNumber > array[index].commentNumber) {
+                array.splice(index,1,current);
+            } else if(index < 0) {
+                array.push(current);
+            }
+            return array;
+        },[]);
 }
 function calcBinRange(comments: YoutubeCommentRow[], binMsec: number): number {
     const maxTimestamp:number = comments.slice(-1)[0].timestampMsec;
