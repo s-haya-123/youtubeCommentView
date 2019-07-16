@@ -29,9 +29,12 @@ export class YoutubeService {
   getYoutubeData(): YoutubeData {
     return this.youtubeData;
   }
-  getYoutubeComment(id: string, bin: number): Observable<CommentData[]> {
+  getYoutubeCommentBurst(id: string, bin: number): Observable<CommentData[]> {
+    return this.getYoutubeComment(id,bin,"getCommentBurst");
+  }
+  private getYoutubeComment(id: string, bin: number, url: string): Observable<CommentData[]> {
     return new Observable( (obserber)=>{
-      this.http.get(`${environment.apiUrl}/getComment?bin=${bin}\&movie_id=${id}`)
+      this.http.get(`${environment.apiUrl}/${url}?bin=${bin}\&movie_id=${id}`)
       .subscribe((datas: Array<any>)=>{
         const commentDatas = datas.map(data=>{
           return new CommentData(data["commentNumber"], data["label"], data["second"], data["messages"]);
