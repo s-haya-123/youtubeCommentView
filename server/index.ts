@@ -25,7 +25,8 @@ export const getComment = async (req:any,res:any) => {
     if ("movie_id" in req.query) {
         const movieId = req.query.movie_id;
         const commets = await getComments(db,client,movieId);
-        const statics = takeStaticsOfComment(commets,bin, true);
+        // const statics = takeStaticsOfComment(commets,bin, true);
+        const statics = takeStaticsOfCommentFromDifferential(commets,4,30000);
         res.header('Access-Control-Allow-Origin', "*");
         res.status(200).send(statics);
     } else  {
@@ -74,6 +75,25 @@ function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isEx
             return commentStatics;
         }
     return comments.reduce(takeStatics, results).map(mapStatics);
+}
+function takeStaticsOfCommentFromDifferential(comments: YoutubeCommentRow[], threshold: number, range: number): YoutubeCommentStatics[] {
+    const differentialComment = (sec: number) =>{
+        const rangeComments = comments
+            .filter((value)=> value.timestampMsec >= sec * 1000 && value.timestampMsec < sec * 1000 + range)
+            .map((value)=>value.message);
+
+        const secondsText = `0${sec % 60}`.slice(-2);
+        const label = `${Math.floor(sec / 60)}:${secondsText}`;
+        return new YoutubeCommentStatics(rangeComments.length,label,sec,rangeComments);
+    }
+    const maxSec = Math.floor(comments.slice(-1)[0].timestampMsec / 1000);
+    const rangeArray = [...Array(maxSec).keys()].slice(1); // range 1..maxSec
+    
+    return rangeArray.map(differentialComment)
+        .filter((value)=>{
+            const dComment = value.messages.length / range * 1000;
+            return dComment >= threshold
+        });
 }
 function calcBinRange(comments: YoutubeCommentRow[], binMsec: number): number {
     const maxTimestamp:number = comments.slice(-1)[0].timestampMsec;
