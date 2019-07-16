@@ -17,6 +17,18 @@ const pgConfig: PoolConfig = {
 let client: Client | null = null;
 
 export const getComment = async (req:any,res:any) => {
+    const staticsFunc = (comments: YoutubeCommentRow[],bin: number):YoutubeCommentStatics[] =>{
+        return takeStaticsOfComment(comments,bin,true);
+    }
+    getCommentSectStatics(req,res,staticsFunc);
+}
+export const getCommentBurst = async (req:any, res: any) =>{
+    const staticsFunc = (comments: YoutubeCommentRow[],bin: number):YoutubeCommentStatics[] =>{
+        return takeStaticsOfCommentFromDifferential(comments,bin,4);
+    }
+    getCommentSectStatics(req,res,staticsFunc);
+}
+async function getCommentSectStatics(req:any, res:any, staticsFunction: (comments: YoutubeCommentRow[],bin: number)=>YoutubeCommentStatics[]) {
     const db = new CommentDatabasePostgres();
     if (!client) {
         client = await db.getPgClient(pgConfig);
@@ -24,9 +36,8 @@ export const getComment = async (req:any,res:any) => {
     const bin = "bin" in req.query ? Number(req.query.bin) : 30000;
     if ("movie_id" in req.query) {
         const movieId = req.query.movie_id;
-        const commets = await getComments(db,client,movieId);
-        // const statics = takeStaticsOfComment(commets,bin, true);
-        const statics = takeStaticsOfCommentFromDifferential(commets,4,30000);
+        const comments = await getComments(db,client,movieId);
+        const statics = staticsFunction(comments,bin);
         res.header('Access-Control-Allow-Origin', "*");
         res.status(200).send(statics);
     } else  {
@@ -77,7 +88,7 @@ function　takeStaticsOfComment(comments: YoutubeCommentRow[], bin: number, isEx
         }
     return comments.reduce(takeStatics, results).map(mapStatics);
 }
-function takeStaticsOfCommentFromDifferential(comments: YoutubeCommentRow[], threshold: number, range: number): YoutubeCommentStatics[] {
+function takeStaticsOfCommentFromDifferential(comments: YoutubeCommentRow[], range: number, threshold: number): YoutubeCommentStatics[] {
     const differentialComment = (sec: number) =>{
         const rangeComments = comments
             .filter((value)=> value.timestampMsec >= sec * 1000 && value.timestampMsec < sec * 1000 + range)
