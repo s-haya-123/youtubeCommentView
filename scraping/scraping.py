@@ -80,8 +80,8 @@ def translate_live_text_to_dto(live_text,timestamp_msec,movie_id):
 def translate_live_paid_to_dto(live_paid,timestamp_msec,movie_id):
     id = live_paid["id"]
     message =  live_paid["message"]["runs"][0]["text"] if "message" in live_paid else ""
-    author_name = live_paid["authorName"]["simpleText"]
-    thumbnails = live_paid["authorPhoto"]["thumbnails"][0]["url"]
+    author_name = live_paid["authorName"]["simpleText"] if "authorName" in live_paid else ""
+    thumbnails = live_paid["authorPhoto"]["thumbnails"][0]["url"] if "authorPhoto" in live_paid else ""
     timestamp_text = live_paid["timestampText"]["simpleText"]
     purchase_amount = live_paid["purchaseAmountText"]["simpleText"]
     return Comment(id,message,author_name,thumbnails,timestamp_msec,timestamp_text,purchase_amount,movie_id)
