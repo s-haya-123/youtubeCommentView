@@ -120,4 +120,21 @@ export class ChartComponent implements AfterViewInit,OnChanges {
       return Array.isArray(arr) && typeof arr[0] === 'string';
     }
   }
+  getComment(mode:ChartMode) {
+    if (mode === ChartMode.burst) {
+      this.youtubeService.getYoutubeCommentBurst(this.id,this.messageRange).subscribe(comments=>{
+        this.chartDatas = comments;
+        const [chartData,minNumber] = this.createChartData(comments);
+        this.chart.data = chartData;
+        this.chart.update();
+      });
+    } else {
+      this.youtubeService.getYoutubeCommentInterval(this.id,this.messageRange).subscribe(comments=>{
+        this.chartDatas = comments;
+        const [chartData,minNumber] = this.createChartData(comments);
+        this.chart.data = chartData;
+        this.chart.update();
+      });
+    }
+  }
 }
