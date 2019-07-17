@@ -1,5 +1,6 @@
+import { getComment } from './../../../../server/index';
 import { Component, AfterViewInit, Input, ViewChild, ElementRef, OnChanges, EventEmitter, Output } from '@angular/core';
-import { Chart } from 'chart.js';
+import { Chart, ChartOptions } from 'chart.js';
 import { YoutubeService, YoutubeData, CommentData } from '../youtube.service';
 
 class ChartElemet {
@@ -7,6 +8,10 @@ class ChartElemet {
   _index: number;
 }
 
+enum ChartMode {
+  burst,
+  interval,
+}
 
 @Component({
   selector: 'app-chart',
@@ -14,7 +19,7 @@ class ChartElemet {
   styleUrls: ['./chart.component.scss'],
 })
 export class ChartComponent implements AfterViewInit,OnChanges {
-
+  ChartMode: typeof ChartMode = ChartMode
   @ViewChild('canvas',{static: false})
   ref: ElementRef;
 
@@ -25,15 +30,16 @@ export class ChartComponent implements AfterViewInit,OnChanges {
   @Output()
   chartClickEvent = new EventEmitter<number>();
 
+  mode: ChartMode = ChartMode.burst;
   private context: CanvasRenderingContext2D;
   private chart: Chart;
-  private color = [ 'rgba(255,99,132,1)' ];
-  private label = "コメント数";
+  private COLOR = [ 'rgba(255,99,132,1)' ];
+  private LABEL = "コメント数";
   private chartDatas:CommentData[];
   messages: string[] = [];
   private messageRange = 30000;
-  private targetColor = 'rgba(204,0,51, 0.2)';
-  private otherColor = ' rgba(0,0,0, 0.1)';
+  private TARGET_COLOR = 'rgba(204,0,51, 0.2)';
+  private OTHER_COLOR = ' rgba(0,0,0, 0.1)';
 
 
   constructor(private youtubeService: YoutubeService) { 
@@ -44,30 +50,34 @@ export class ChartComponent implements AfterViewInit,OnChanges {
     if( changes.id && this.id != "") {
       this.youtubeService.getYoutubeCommentBurst(this.id,this.messageRange).subscribe(comments=>{
         this.chartDatas = comments;
-        this.drawCanvas();
+        this.initCanvas(comments);
       });
-    }    
+    }
   }
   
   ngAfterViewInit() {
     // canvasを取得
   }
-  private drawCanvas() {
-    this.context = this.ref.nativeElement.getContext('2d');
-    let labels = this.chartDatas.map( (chartData: CommentData) => chartData.label );
-    let datas = this.chartDatas.map( (chartData: CommentData)=> chartData.commentNumber);
-    let backgroudColor = new Array(datas.length).fill(this.otherColor);
-
-    let data:Chart.ChartData = {
+  private createChartData(chartDatas: CommentData[]): [Chart.ChartData,number] {
+    let labels = chartDatas.map( (chartData: CommentData) => chartData.label );
+    let datas = chartDatas.map( (chartData: CommentData)=> chartData.commentNumber);
+    let backgroudColor = new Array(datas.length).fill(this.OTHER_COLOR);
+    const minNumber = [...chartDatas].map(v=>v.commentNumber).sort()[0];
+    let data = {
       labels: labels,
       datasets: [{
-        label: this.label,
+        label: this.LABEL,
         data: datas,
         backgroundColor: backgroudColor,
         hoverBackgroundColor: backgroudColor,
         borderWidth: 1,
       }]
     };
+    return [data,minNumber];
+  }
+  private initCanvas(chartDatas: CommentData[]) {
+    this.context = this.ref.nativeElement.getContext('2d');
+    const [data,minNumber] = this.createChartData(chartDatas);
     
     Chart.defaults.global.defaultFontColor = 'black';
     this.chart = new Chart(this.context, {
@@ -80,7 +90,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
         scales: {
           yAxes: [{
             ticks: {
-              suggestedMin: [...datas].sort()[0] - 10
+              suggestedMin: minNumber - 10
             }
           }]
         },
@@ -101,7 +111,7 @@ export class ChartComponent implements AfterViewInit,OnChanges {
     let backgroudColors = this.chart.data.datasets[0].backgroundColor;
     if (isStrings(backgroudColors)) {
       this.chart.data.datasets[0].backgroundColor = backgroudColors.map((_, index)=>{
-        return index === clickIndex ? this.targetColor : this.otherColor;
+        return index === clickIndex ? this.TARGET_COLOR : this.OTHER_COLOR;
       });
       this.chart.update();
     }
@@ -111,4 +121,3 @@ export class ChartComponent implements AfterViewInit,OnChanges {
     }
   }
 }
-
