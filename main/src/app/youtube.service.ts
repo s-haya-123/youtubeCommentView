@@ -32,6 +32,9 @@ export class YoutubeService {
   getYoutubeCommentBurst(id: string, bin: number): Observable<CommentData[]> {
     return this.getYoutubeComment(id,bin,"getCommentBurst");
   }
+  getYoutubeCommentInterval(id: string, bin: number): Observable<CommentData[]> {
+    return this.getYoutubeComment(id,bin,"getComment");
+  }
   private getYoutubeComment(id: string, bin: number, url: string): Observable<CommentData[]> {
     return new Observable( (obserber)=>{
       this.http.get(`${environment.apiUrl}/${url}?bin=${bin}\&movie_id=${id}`)
