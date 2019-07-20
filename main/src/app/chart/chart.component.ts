@@ -1,4 +1,3 @@
-import { getComment } from './../../../../server/index';
 import { Component, AfterViewInit, Input, ViewChild, ElementRef, OnChanges, EventEmitter, Output } from '@angular/core';
 import { Chart, ChartOptions } from 'chart.js';
 import { YoutubeService, YoutubeData, CommentData } from '../youtube.service';
