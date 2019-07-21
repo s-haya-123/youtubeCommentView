@@ -2,6 +2,7 @@
     <div *ngFor="let thumbnail of thumbnails$ | async" class="thumbnail-wrap" (click)="movePlay(thumbnail)">
             <img class="thumbnail" src="http://img.youtube.com/vi/{{thumbnail.id}}/sddefault.jpg"/>
             <div class="title">{{thumbnail.title}}</div>
+            <div>コメント総数：　{{thumbnail.count}}</div>
     </div>
 </div>
 

@@ -11,7 +11,7 @@ export class PlayComponent implements OnInit {
   player: YT.Player;
   canvasWidth: number;
   canvasHeight: number;
-  youtubeData: YoutubeData = new YoutubeData("","");
+  youtubeData: YoutubeData = new YoutubeData("","",-1);
   title:string;
   constructor(private youtubeService: YoutubeService, private location: Location) { } 
   ngOnInit() {

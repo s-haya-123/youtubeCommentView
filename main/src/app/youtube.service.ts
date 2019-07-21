@@ -15,7 +15,8 @@ export class CommentData {
 export class YoutubeData {
   constructor(
     public title: string,
-    public id:String,
+    public id: String,
+    public count: number
   ) {}
 }
 
@@ -52,7 +53,7 @@ export class YoutubeService {
       this.http.get(`${environment.apiUrl}/getMovie`)
       .subscribe((datas: Array<any>)=>{
         const youtubeData = datas.map(data=>{
-          return new YoutubeData(data["title"],data["id"]);
+          return new YoutubeData(data["title"],data["id"],data["commentCount"]);
         });
         observer.next(youtubeData);
         return {unsubscribe() {}};
