@@ -1,4 +1,4 @@
-import { CommentDatabase, CommentDatabasePostgres, YoutubeCommentRow, YoutubeCommentStatics } from './Comment';
+import { CommentDatabase, CommentDatabasePostgres, YoutubeCommentRow, YoutubeCommentStatics, YoutubeCommentCount } from './Comment';
 import { Movie, MovieDatabase, MovieDatabasePostgres } from './Movie';
 import { PoolConfig, Pool, Client } from 'pg';
 
@@ -24,7 +24,7 @@ export const getComment = async (req:any,res:any) => {
 }
 export const getCommentBurst = async (req:any, res: any) =>{
     const staticsFunc = (comments: YoutubeCommentRow[],bin: number):YoutubeCommentStatics[] =>{
-        return takeStaticsOfCommentFromDifferential(comments,bin,4);
+        return takeStaticsOfCommentFromDifferential(comments,bin,3.5);
     }
     getCommentSectStatics(req,res,staticsFunc);
 }
@@ -47,17 +47,25 @@ async function getCommentSectStatics(req:any, res:any, staticsFunction: (comment
 
 export const getMovie = async (req:any,res:any) => {
     const db = new MovieDatabasePostgres();
+    const comment = new CommentDatabasePostgres();
     if (!client) {
         client = await db.getPgClient(pgConfig);
     }
     const movies = await getAllMovies(db, client);
+    const youtubeCommentCounts = await countCommentsCount(comment,client);
+    const returnArray: (YoutubeCommentCount & Movie)[] = movies.map((movie)=>{
+        const count = youtubeCommentCounts.find((value)=>value.id === movie.id)
+        return Object.assign(movie,count);
+    })
     res.header('Access-Control-Allow-Origin', "*");
-    res.status(200).send(movies);
+    res.status(200).send(returnArray);
 }
 async function getAllMovies(db: MovieDatabase, client: Client): Promise<Movie[]> {
     return db.getAllMovies(client);
 }
-
+async function countCommentsCount(db: CommentDatabase,client: Client): Promise<YoutubeCommentCount[]> {
+    return db.countAllCommentsByMovieId(client);
+}
 async function getComments(db: CommentDatabase,client:Client ,movieId: string): Promise<YoutubeCommentRow[]> {
     return db.getComments(client,movieId);
 }

@@ -2,7 +2,8 @@ import { Client, PoolConfig } from 'pg';
 export class Movie {
     constructor(
         public id: string,
-        public title: string
+        public title: string,
+        public commentCount?: number
     ){}
 }
 

@@ -19,12 +19,25 @@ export class YoutubeCommentStatics {
         public messages: string[]
     ){}
 }
+export class YoutubeCommentCount {
+    constructor(
+        public id: string,
+        public commentCount: number
+    ){}
+}
 
 export interface CommentDatabase {
     getComments(client:Client, movieId: string): Promise<YoutubeCommentRow[]>;
+    countAllCommentsByMovieId(client:Client): Promise<YoutubeCommentCount[]>;
 }
 
 export class CommentDatabasePostgres implements CommentDatabase {
+    async countAllCommentsByMovieId(client: Client): Promise<YoutubeCommentCount[]> {
+        const result = await client.query(`select movie_id,count(*) from comment group by movie_id;`);
+        return result.rows.map((row)=>{
+            return new YoutubeCommentCount(row["movie_id"],row["count"]);
+        });
+    }
     async getComments(client: Client, movieId: string): Promise<YoutubeCommentRow[]>{
         return this.getCommentsFromPg(client,movieId);
     }
