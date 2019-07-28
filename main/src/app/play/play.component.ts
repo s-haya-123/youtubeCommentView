@@ -15,6 +15,10 @@ export class PlayComponent implements OnInit {
   title:string;
   constructor(private youtubeService: YoutubeService, private location: Location) { } 
   ngOnInit() {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto"
+  });
     if(this.youtubeService.getYoutubeData()===undefined) {
       this.location.back();
     } else {
