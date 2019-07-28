@@ -11,13 +11,15 @@ import { ChartComponent } from './chart/chart.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { ListComponent } from './list/list.component';
+import { TopComponent } from './top/top.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PlayComponent,
     ChartComponent,
-    ListComponent
+    ListComponent,
+    TopComponent
   ],
   imports: [
     BrowserModule,
