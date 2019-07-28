@@ -1,0 +1,35 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+    .message{
+        margin: auto;
+        width: 60%;
+    }
+  }
+  .btn-border {
+    display: inline-block;
+    text-align: left;
+    border: 2px solid #31a9ee;
+    font-size: 16px;
+    color: #31a9ee;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-align: center;
+    transition: 0.4s;
+    width: 30%;
+    margin: auto;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-border:hover {
+    background-color: #31a9ee;
+    border-color: #31a9ee;
+    color: #FFF;
+  }
